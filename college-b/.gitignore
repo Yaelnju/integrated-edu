@@ -1,0 +1,29 @@
+# ---- Build output ----
+target/
+*.class
+*.jar
+
+# ---- IDE / editor ----
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.project
+.classpath
+.settings/
+.dbeaver/
+
+# ---- OS ----
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- Java/JVM runtime ----
+*.log
+hs_err_pid*.log
+replay_pid*.log
+
+# ---- Local secrets / overrides ----
+# application-local.properties 用于本地覆盖默认配置，不要进仓库
+src/main/resources/application-local.properties

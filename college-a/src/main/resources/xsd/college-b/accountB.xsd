@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ACCOUNT 表的 XML 形状约束（内部使用，目前协议未直接暴露）。
+  ACC_LEVEL: 1=管理员 2=学生；STU_NO 仅学生账户有，admin 缺省 → minOccurs=0。
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:element name="Accounts">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="account" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ACC_NO"    type="xs:string"/>
+              <xs:element name="ACC_PWD"   type="xs:string"/>
+              <xs:element name="ACC_LEVEL" type="xs:int"/>
+              <xs:element name="STU_NO"    type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

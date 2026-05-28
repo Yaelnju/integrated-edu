@@ -1,0 +1,34 @@
+# ---- Build output ----
+**/target/
+*.class
+*.jar
+!**/src/**/*.class
+
+# ---- IDE / editor ----
+.idea/
+**/.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+**/.dbeaver/
+.project
+**/.project
+.classpath
+**/.classpath
+.settings/
+**/.settings/
+
+# ---- OS ----
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- Java runtime ----
+*.log
+hs_err_pid*.log
+replay_pid*.log
+
+# ---- Local secrets / overrides ----
+**/src/main/resources/application-local.properties
+**/application.properties.local
