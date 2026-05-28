@@ -21,7 +21,13 @@ cd C:\Users\YaelCheng\Programming\DataIntegration\integrated-edu
 | ④ | College C | `mvn -q -pl college-c exec:java` | 9000 / 9100 | `[CollegeC] 已连接 MySQL 库` |
 
 集成服务器必须 **先** 起；A/B/C 之间不分先后。
-A/B/C 任一窗口都会弹出 Swing 登录界面（学生用 `A20240001` / `B240000001` / `C202401`，管理员 `admin`，密码均 `123456`）。
+A/B/C 任一窗口都会弹出 Swing 登录界面：
+
+| 学院 | 示例学生 / 密码 | 管理员 / 密码 |
+|---|---|---|
+| A | A20240001 / 123456 | admin / admin123 |
+| B | B24000001 / 123456 | admin / admin123 |
+| C | C20240001 / 000000 | admin / admin888888 |
 
 ## 3. 验证联调
 
