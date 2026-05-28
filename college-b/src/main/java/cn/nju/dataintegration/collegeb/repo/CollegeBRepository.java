@@ -123,20 +123,30 @@ public final class CollegeBRepository {
      * CRS_NO VARCHAR2(5) 最长 5 字节，可容纳 A 院 4 字符课号（AC01 等）和 C 院 4 字符课号。
      */
     public void ensureCourseForCross(Connection c, String cno, String courseName) throws SQLException {
-        try (PreparedStatement ps = c.prepareStatement("SELECT 1 FROM COURSE WHERE CRS_NO=?")) {
-            ps.setString(1, cno);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) return;
+        String name = (courseName != null && !courseName.isBlank()) ? courseName : cno;
+        String trunc = name.length() > 16 ? name.substring(0, 16) : name;
+        try (PreparedStatement sel = c.prepareStatement("SELECT CRS_NAME FROM COURSE WHERE CRS_NO=?")) {
+            sel.setString(1, cno);
+            try (ResultSet rs = sel.executeQuery()) {
+                if (rs.next()) {
+                    String existing = rs.getString(1);
+                    if (existing == null || existing.isBlank() || existing.contains("外院") || existing.equals(cno)) {
+                        try (PreparedStatement up = c.prepareStatement(
+                                "UPDATE COURSE SET CRS_NAME=? WHERE CRS_NO=?")) {
+                            up.setString(1, trunc);
+                            up.setString(2, cno);
+                            up.executeUpdate();
+                        }
+                    }
+                    return;
+                }
             }
         }
-        String name = (courseName != null && !courseName.isBlank()) ? courseName : cno;
         try (PreparedStatement ps = c.prepareStatement(
                 "INSERT INTO COURSE(CRS_NO,CRS_NAME,PERIODS,CREDIT,TEACHER,LOCATION,SHARED) " +
-                "VALUES(?,?,0,1,?,?,0)")) {
+                "VALUES(?,?,0,1,'外院','外院','0')")) {
             ps.setString(1, cno);
-            ps.setString(2, name.length() > 16 ? name.substring(0, 16) : name);
-            ps.setString(3, "外院");
-            ps.setString(4, "外院");
+            ps.setString(2, trunc);
             ps.executeUpdate();
         }
     }

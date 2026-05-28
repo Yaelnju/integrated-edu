@@ -111,19 +111,29 @@ public final class CollegeCRepository {
      */
     public void ensureCourseForCross(Connection c, String cno, String courseName) throws SQLException {
         if (cno.length() > 4) return;
-        try (PreparedStatement ps = c.prepareStatement("SELECT 1 FROM course WHERE Cno=?")) {
-            ps.setString(1, cno);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) return;
+        String name = (courseName != null && !courseName.isBlank()) ? courseName : cno;
+        String trunc = name.length() > 20 ? name.substring(0, 20) : name;
+        try (PreparedStatement sel = c.prepareStatement("SELECT Cnm FROM course WHERE Cno=?")) {
+            sel.setString(1, cno);
+            try (ResultSet rs = sel.executeQuery()) {
+                if (rs.next()) {
+                    String existing = rs.getString(1);
+                    if (existing == null || existing.isBlank() || existing.contains("外院") || existing.equals(cno)) {
+                        try (PreparedStatement up = c.prepareStatement(
+                                "UPDATE course SET Cnm=? WHERE Cno=?")) {
+                            up.setString(1, trunc);
+                            up.setString(2, cno);
+                            up.executeUpdate();
+                        }
+                    }
+                    return;
+                }
             }
         }
-        String name = (courseName != null && !courseName.isBlank()) ? courseName : cno;
         try (PreparedStatement ps = c.prepareStatement(
-                "INSERT INTO course(Cno,Cnm,Ctm,Cpt,Tec,Pla,Share) VALUES(?,?,0,1,?,?,0)")) {
+                "INSERT INTO course(Cno,Cnm,Ctm,Cpt,Tec,Pla,Share) VALUES(?,?,0,1,'外院','外院','0')")) {
             ps.setString(1, cno);
-            ps.setString(2, name.length() > 20 ? name.substring(0, 20) : name);
-            ps.setString(3, "外院");
-            ps.setString(4, "外院");
+            ps.setString(2, trunc);
             ps.executeUpdate();
         }
     }

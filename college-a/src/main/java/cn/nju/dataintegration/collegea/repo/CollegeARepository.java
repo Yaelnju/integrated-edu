@@ -101,13 +101,24 @@ public final class CollegeARepository {
 
     /** 跨院写回前置：CourseID VARCHAR(9) 可容纳任意学院课号。 */
     public void ensureCourseForCross(Connection c, String cno, String courseName) throws SQLException {
-        try (PreparedStatement ps = c.prepareStatement("SELECT 1 FROM Course WHERE CourseID=?")) {
-            ps.setString(1, cno);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) return;
+        String name = (courseName != null && !courseName.isBlank()) ? courseName : cno;
+        try (PreparedStatement sel = c.prepareStatement("SELECT CourseName FROM Course WHERE CourseID=?")) {
+            sel.setString(1, cno);
+            try (ResultSet rs = sel.executeQuery()) {
+                if (rs.next()) {
+                    String existing = rs.getString(1);
+                    if (existing == null || existing.isBlank() || existing.contains("外院") || existing.equals(cno)) {
+                        try (PreparedStatement up = c.prepareStatement(
+                                "UPDATE Course SET CourseName=? WHERE CourseID=?")) {
+                            up.setString(1, name);
+                            up.setString(2, cno);
+                            up.executeUpdate();
+                        }
+                    }
+                    return;
+                }
             }
         }
-        String name = (courseName != null && !courseName.isBlank()) ? courseName : cno;
         try (PreparedStatement ps = c.prepareStatement(
                 "INSERT INTO Course(CourseID,CourseName,Credit,Teacher,IsShared) VALUES(?,?,1,N'外院',0)")) {
             ps.setString(1, cno);
