@@ -20,7 +20,7 @@ public final class LoginFrame extends JFrame {
 
     public LoginFrame(AppConfig config) {
         this.config = config;
-        setTitle("院系 C 教务系统 — 登录");
+        setTitle("院系 C 软件学院教务系统 — 登录");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         JPanel form = new JPanel(new GridLayout(0, 1, 6, 6));
         form.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));

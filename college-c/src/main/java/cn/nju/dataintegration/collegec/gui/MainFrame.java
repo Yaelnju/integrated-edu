@@ -21,9 +21,9 @@ public final class MainFrame extends JFrame {
     private final String userId;
     private final CollegeCClient client;
     private final DefaultTableModel courseModel = new DefaultTableModel(
-            new Object[]{"课程号", "名称", "课时", "学分", "教师", "地点", "共享"}, 0);
+            new Object[]{"课程编号", "课程名称", "课时", "学分", "教师", "地点", "共享"}, 0);
     private final DefaultTableModel selModel = new DefaultTableModel(
-            new Object[]{"学号", "课程号", "成绩", "课程名"}, 0);
+            new Object[]{"学号", "课程编号", "得分", "课程名称"}, 0);
     private final JTextField pickField = new JTextField(6);
     private final JTextField dropField = new JTextField(6);
     private final JTextField crossCnoField = new JTextField(6);
@@ -34,14 +34,14 @@ public final class MainFrame extends JFrame {
         this.role = role;
         this.userId = userId;
         this.client = new CollegeCClient(config);
-        setTitle("院系 C 教务系统 — " + role + " — " + userId);
+        setTitle("院系 C 软件学院教务系统 — " + role + " — " + userId);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout(8, 8));
         JTable courseTable = new JTable(courseModel);
         JTable selTable = new JTable(selModel);
         JPanel center = new JPanel(new BorderLayout(8, 8));
         center.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
-        center.add(new JLabel("课程列表"), BorderLayout.NORTH);
+        center.add(new JLabel("课程列表（本院）"), BorderLayout.NORTH);
         center.add(new JScrollPane(courseTable), BorderLayout.CENTER);
         JPanel east = new JPanel(new BorderLayout(8, 8));
         east.add(new JLabel("我的选课"), BorderLayout.NORTH);
@@ -53,7 +53,7 @@ public final class MainFrame extends JFrame {
         if ("STUDENT".equals(role)) {
             actions.add(new JLabel("选课号"));
             actions.add(pickField);
-            JButton pick = new JButton("选课");
+            JButton pick = new JButton("本院选课");
             pick.addActionListener(e -> doPick());
             actions.add(pick);
             actions.add(new JLabel("退课号"));
@@ -123,7 +123,7 @@ public final class MainFrame extends JFrame {
         try {
             String cno = pickField.getText().trim();
             String res = client.call("PICK|" + userId + "|" + cno);
-            JOptionPane.showMessageDialog(this, res.contains("OK") ? "选课成功或已选" : "选课失败（已满5门或重复）", "结果", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, res.contains("OK") ? "选课成功或已选" : "选课失败（已满 5 门或重复）", "结果", JOptionPane.INFORMATION_MESSAGE);
             refreshAll();
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "选课失败", JOptionPane.ERROR_MESSAGE);
