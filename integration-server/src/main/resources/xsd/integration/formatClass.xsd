@@ -12,7 +12,14 @@
               <xs:element name="score" type="xs:int"/>
               <xs:element name="teacher" type="xs:string"/>
               <xs:element name="location" type="xs:string"/>
-              <xs:element name="share" type="xs:string" minOccurs="0"/>
+              <xs:element name="share" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:enumeration value="0"/>
+                    <xs:enumeration value="1"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
             </xs:sequence>
           </xs:complexType>
         </xs:element>

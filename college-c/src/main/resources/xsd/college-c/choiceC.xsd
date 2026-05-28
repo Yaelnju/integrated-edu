@@ -8,7 +8,14 @@
             <xs:sequence>
               <xs:element name="Sno" type="xs:string"/>
               <xs:element name="Cno" type="xs:string"/>
-              <xs:element name="Grd" type="xs:int"/>
+              <xs:element name="Grd">
+                <xs:simpleType>
+                  <xs:restriction base="xs:int">
+                    <xs:minInclusive value="0"/>
+                    <xs:maxInclusive value="100"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
             </xs:sequence>
           </xs:complexType>
         </xs:element>
