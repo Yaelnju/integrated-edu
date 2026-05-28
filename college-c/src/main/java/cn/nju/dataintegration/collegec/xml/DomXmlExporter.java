@@ -17,21 +17,21 @@ import java.sql.SQLException;
 public final class DomXmlExporter {
 
     public String exportStudents(Connection c) throws SQLException, IOException {
-        try (PreparedStatement ps = c.prepareStatement("SELECT Sno,Snm,Sex,Sde,Pwd FROM student ORDER BY Sno");
+        try (PreparedStatement ps = c.prepareStatement("SELECT Sno,Snm,Sex,Sde,Pwd FROM student WHERE Sno LIKE 'C%' ORDER BY Sno");
              ResultSet rs = ps.executeQuery()) {
             return resultSetToXml(rs, "Students", "student");
         }
     }
 
     public String exportCourses(Connection c) throws SQLException, IOException {
-        try (PreparedStatement ps = c.prepareStatement("SELECT Cno,Cnm,Ctm,Cpt,Tec,Pla,Share FROM course ORDER BY Cno");
+        try (PreparedStatement ps = c.prepareStatement("SELECT Cno,Cnm,Ctm,Cpt,Tec,Pla,Share FROM course WHERE Cno LIKE 'C%' ORDER BY Cno");
              ResultSet rs = ps.executeQuery()) {
             return resultSetToXml(rs, "Courses", "course");
         }
     }
 
     public String exportChoices(Connection c) throws SQLException, IOException {
-        try (PreparedStatement ps = c.prepareStatement("SELECT Sno,Cno,Grd FROM sc ORDER BY Sno,Cno");
+        try (PreparedStatement ps = c.prepareStatement("SELECT Sno,Cno,Grd FROM sc WHERE Sno LIKE 'C%' AND Cno LIKE 'C%' ORDER BY Sno,Cno");
              ResultSet rs = ps.executeQuery()) {
             return resultSetToXml(rs, "Choices", "choice");
         }

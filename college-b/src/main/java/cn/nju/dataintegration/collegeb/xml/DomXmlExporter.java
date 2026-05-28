@@ -23,7 +23,7 @@ public final class DomXmlExporter {
 
     public String exportStudents(Connection c) throws SQLException, IOException {
         try (PreparedStatement ps = c.prepareStatement(
-                "SELECT STU_NO, STU_NAME, SEX, MAJOR, PWD FROM STUDENT ORDER BY STU_NO");
+                "SELECT STU_NO, STU_NAME, SEX, MAJOR, PWD FROM STUDENT WHERE SUBSTR(STU_NO,1,1)='B' ORDER BY STU_NO");
              ResultSet rs = ps.executeQuery()) {
             return resultSetToXml(rs, "Students", "student");
         }
@@ -32,7 +32,7 @@ public final class DomXmlExporter {
     public String exportCourses(Connection c) throws SQLException, IOException {
         try (PreparedStatement ps = c.prepareStatement(
                 "SELECT CRS_NO, CRS_NAME, PERIODS, CREDIT, TEACHER, LOCATION, SHARED " +
-                "FROM COURSE ORDER BY CRS_NO");
+                "FROM COURSE WHERE SUBSTR(CRS_NO,1,1)='B' ORDER BY CRS_NO");
              ResultSet rs = ps.executeQuery()) {
             return resultSetToXml(rs, "Courses", "course");
         }
@@ -40,7 +40,7 @@ public final class DomXmlExporter {
 
     public String exportChoices(Connection c) throws SQLException, IOException {
         try (PreparedStatement ps = c.prepareStatement(
-                "SELECT STU_NO, CRS_NO, SCORE FROM ENROLLMENT ORDER BY STU_NO, CRS_NO");
+                "SELECT STU_NO, CRS_NO, SCORE FROM ENROLLMENT WHERE SUBSTR(STU_NO,1,1)='B' AND SUBSTR(CRS_NO,1,1)='B' ORDER BY STU_NO, CRS_NO");
              ResultSet rs = ps.executeQuery()) {
             return resultSetToXml(rs, "Choices", "choice");
         }

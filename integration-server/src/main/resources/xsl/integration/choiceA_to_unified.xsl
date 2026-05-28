@@ -7,7 +7,10 @@
         <choice>
           <sid><xsl:value-of select="StuID"/></sid>
           <cid><xsl:value-of select="CourseID"/></cid>
-          <score><xsl:value-of select="Grade"/></score>
+          <score><xsl:choose>
+            <xsl:when test="Grade != ''"><xsl:value-of select="Grade"/></xsl:when>
+            <xsl:otherwise>0</xsl:otherwise>
+          </xsl:choose></score>
         </choice>
       </xsl:for-each>
     </Choices>

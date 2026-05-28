@@ -18,7 +18,7 @@ public final class DomXmlExporter {
 
     public String exportStudents(Connection c) throws SQLException, IOException {
         try (PreparedStatement ps = c.prepareStatement(
-                "SELECT StuID, StuName, Gender, Dept FROM Student ORDER BY StuID");
+                "SELECT StuID, StuName, Gender, Dept FROM Student WHERE StuID LIKE 'A%' ORDER BY StuID");
              ResultSet rs = ps.executeQuery()) {
             return resultSetToXml(rs, "Students", "student");
         }
@@ -26,7 +26,7 @@ public final class DomXmlExporter {
 
     public String exportCourses(Connection c) throws SQLException, IOException {
         try (PreparedStatement ps = c.prepareStatement(
-                "SELECT CourseID, CourseName, Credit, Teacher, IsShared FROM Course ORDER BY CourseID");
+                "SELECT CourseID, CourseName, Credit, Teacher, IsShared FROM Course WHERE CourseID LIKE 'A%' ORDER BY CourseID");
              ResultSet rs = ps.executeQuery()) {
             return resultSetToXml(rs, "Courses", "course");
         }
@@ -34,7 +34,7 @@ public final class DomXmlExporter {
 
     public String exportChoices(Connection c) throws SQLException, IOException {
         try (PreparedStatement ps = c.prepareStatement(
-                "SELECT StuID, CourseID, Grade FROM Enrollment ORDER BY StuID, CourseID");
+                "SELECT StuID, CourseID, ISNULL(Grade, 0) AS Grade FROM Enrollment WHERE StuID LIKE 'A%' AND CourseID LIKE 'A%' ORDER BY StuID, CourseID");
              ResultSet rs = ps.executeQuery()) {
             return resultSetToXml(rs, "Choices", "choice");
         }
