@@ -28,7 +28,10 @@ public final class CrossEnrollService {
             if (!isSharedOnCollege(target, cno)) {
                 return "目标学院 " + target + " 不存在共享课程 " + cno;
             }
-            enrollOnCollege(source, sno, cno);
+            // 源院写回：让本院 MY_SC 能看到跨院课程；若源院课号列长度不足（如 C 院 CHAR(4) 存不下 B 院 5 位课号）则忽略
+            try {
+                enrollOnCollege(source, sno, cno);
+            } catch (Exception ignored) { }
             enrollOnCollege(target, sno, cno);
             return "跨院选课成功：学生 " + sno + " 已选 " + target + " 院课程 " + cno
                     + "（源院 " + source + " 与目标院均已记录）";

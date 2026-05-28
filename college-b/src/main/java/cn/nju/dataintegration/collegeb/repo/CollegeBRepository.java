@@ -118,6 +118,28 @@ public final class CollegeBRepository {
     }
 
     /**
+     * 跨院写回前置：若 cno 在本院 COURSE 表不存在，插一条占位记录避免 FK 失败。
+     * CRS_NO VARCHAR2(5) 最长 5 字节，可容纳 A 院 4 字符课号（AC01 等）和 C 院 4 字符课号。
+     */
+    public void ensureCourseForCross(Connection c, String cno) throws SQLException {
+        try (PreparedStatement ps = c.prepareStatement("SELECT 1 FROM COURSE WHERE CRS_NO=?")) {
+            ps.setString(1, cno);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return;
+            }
+        }
+        try (PreparedStatement ps = c.prepareStatement(
+                "INSERT INTO COURSE(CRS_NO,CRS_NAME,PERIODS,CREDIT,TEACHER,LOCATION,SHARED) " +
+                "VALUES(?,?,0,1,?,?,0)")) {
+            ps.setString(1, cno);
+            ps.setString(2, "外院课程");
+            ps.setString(3, "外院");
+            ps.setString(4, "外院");
+            ps.executeUpdate();
+        }
+    }
+
+    /**
      * 选课：上限 5 门；命中复合主键唯一约束（已选过同一门）也算失败。
      */
     public boolean pickCourse(Connection c, String sno, String cno) throws SQLException {

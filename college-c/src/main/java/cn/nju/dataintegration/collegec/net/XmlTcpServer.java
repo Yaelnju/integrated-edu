@@ -113,6 +113,7 @@ public final class XmlTcpServer implements Runnable {
         String sno = parts[1];
         String cno = parts[2];
         repo.ensureStudentForCross(c, sno);
+        repo.ensureCourseForCross(c, cno);
         boolean ok = repo.pickCourse(c, sno, cno);
         if (ok) {
             writeOk(socket);
