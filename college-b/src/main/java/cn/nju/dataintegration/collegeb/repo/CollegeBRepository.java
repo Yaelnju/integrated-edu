@@ -67,7 +67,7 @@ public final class CollegeBRepository {
         List<String[]> rows = new ArrayList<>();
         try (PreparedStatement ps = c.prepareStatement(
                 "SELECT e.STU_NO, e.CRS_NO, e.SCORE, " +
-                "NVL(co.CRS_NAME, '(外院课程)') AS CRS_NAME " +
+                "NVL(co.CRS_NAME, e.CRS_NO) AS CRS_NAME " +
                 "FROM ENROLLMENT e LEFT JOIN COURSE co ON co.CRS_NO = e.CRS_NO " +
                 "WHERE e.STU_NO=? ORDER BY e.CRS_NO")) {
             ps.setString(1, sno);
