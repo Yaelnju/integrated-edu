@@ -100,16 +100,18 @@ public final class CollegeARepository {
     }
 
     /** 跨院写回前置：CourseID VARCHAR(9) 可容纳任意学院课号。 */
-    public void ensureCourseForCross(Connection c, String cno) throws SQLException {
+    public void ensureCourseForCross(Connection c, String cno, String courseName) throws SQLException {
         try (PreparedStatement ps = c.prepareStatement("SELECT 1 FROM Course WHERE CourseID=?")) {
             ps.setString(1, cno);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return;
             }
         }
+        String name = (courseName != null && !courseName.isBlank()) ? courseName : cno;
         try (PreparedStatement ps = c.prepareStatement(
-                "INSERT INTO Course(CourseID,CourseName,Credit,Teacher,IsShared) VALUES(?,N'外院课程',1,N'外院',0)")) {
+                "INSERT INTO Course(CourseID,CourseName,Credit,Teacher,IsShared) VALUES(?,?,1,N'外院',0)")) {
             ps.setString(1, cno);
+            ps.setString(2, name);
             ps.executeUpdate();
         }
     }

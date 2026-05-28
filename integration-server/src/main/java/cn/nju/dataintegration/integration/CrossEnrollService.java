@@ -25,12 +25,13 @@ public final class CrossEnrollService {
         try {
             String source = detectStudentCollege(sno);
             String target = targetCollege.trim().toUpperCase(Locale.ROOT);
-            if (!isSharedOnCollege(target, cno)) {
+            String courseName = fetchCourseName(target, cno);
+            if (courseName == null) {
                 return "目标学院 " + target + " 不存在共享课程 " + cno;
             }
-            // 源院写回：让本院 MY_SC 能看到跨院课程；若源院课号列长度不足（如 C 院 CHAR(4) 存不下 B 院 5 位课号）则忽略
+            // 源院写回：携带真实课程名；若源院课号列长度不足（如 C 院 CHAR(4) 存不下 B 院 5 位课号）则忽略
             try {
-                enrollOnCollege(source, sno, cno);
+                xmlClient(source).enrollXmlWithName(sno, cno, courseName);
             } catch (Exception ignored) { }
             enrollOnCollege(target, sno, cno);
             return "跨院选课成功：学生 " + sno + " 已选 " + target + " 院课程 " + cno
@@ -54,18 +55,23 @@ public final class CrossEnrollService {
         }
     }
 
-    private boolean isSharedOnCollege(String college, String cno) throws Exception {
+    /** 若课程存在且共享，返回课程名；否则返回 null。 */
+    private String fetchCourseName(String college, String cno) throws Exception {
         String xml = fetchUnifiedCoursesXml(college);
         String targetId = normalizeCourseIdForUnified(college, cno);
         Document doc = reader.read(new StringReader(xml));
         for (Object n : doc.selectNodes("//Classes/class")) {
             var el = (org.dom4j.Element) n;
-            String shared = el.elementText("share");
-            if (targetId.equals(el.elementText("id")) && isSharedFlag(shared)) {
-                return true;
+            if (targetId.equals(el.elementText("id")) && isSharedFlag(el.elementText("share"))) {
+                String name = el.elementText("name");
+                return name != null && !name.isBlank() ? name : cno;
             }
         }
-        return false;
+        return null;
+    }
+
+    private boolean isSharedOnCollege(String college, String cno) throws Exception {
+        return fetchCourseName(college, cno) != null;
     }
 
     private String fetchUnifiedCoursesXml(String college) throws Exception {

@@ -30,10 +30,21 @@ public final class RemoteCollegeClient {
         }
     }
 
+    public void enrollXmlWithName(String sno, String cno, String courseName) throws IOException {
+        enrollXml(sno, cno, courseName);
+    }
+
     public void enrollXml(String sno, String cno) throws IOException {
+        enrollXml(sno, cno, null);
+    }
+
+    private void enrollXml(String sno, String cno, String courseName) throws IOException {
         try (Socket s = new Socket(host, port)) {
             var w = new OutputStreamWriter(s.getOutputStream(), StandardCharsets.UTF_8);
-            w.write("ENROLL|" + sno + "|" + cno + "\n");
+            String cmd = (courseName != null && !courseName.isBlank())
+                    ? "ENROLL|" + sno + "|" + cno + "|" + courseName + "\n"
+                    : "ENROLL|" + sno + "|" + cno + "\n";
+            w.write(cmd);
             w.flush();
             BufferedReader br = new BufferedReader(
                     new InputStreamReader(s.getInputStream(), StandardCharsets.UTF_8));

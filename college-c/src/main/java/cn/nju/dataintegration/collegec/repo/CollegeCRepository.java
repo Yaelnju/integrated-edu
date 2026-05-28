@@ -109,7 +109,7 @@ public final class CollegeCRepository {
      * 跨院写回前置：Cno CHAR(4) 只能存 4 字符，长于 4 字符的外院课号（如 B 院 5 字符）直接跳过。
      * 跳过后 pickCourse 的 FK 仍会失败，由 CrossEnrollService 的 try-catch 忽略源院写回失败。
      */
-    public void ensureCourseForCross(Connection c, String cno) throws SQLException {
+    public void ensureCourseForCross(Connection c, String cno, String courseName) throws SQLException {
         if (cno.length() > 4) return;
         try (PreparedStatement ps = c.prepareStatement("SELECT 1 FROM course WHERE Cno=?")) {
             ps.setString(1, cno);
@@ -117,10 +117,11 @@ public final class CollegeCRepository {
                 if (rs.next()) return;
             }
         }
+        String name = (courseName != null && !courseName.isBlank()) ? courseName : cno;
         try (PreparedStatement ps = c.prepareStatement(
                 "INSERT INTO course(Cno,Cnm,Ctm,Cpt,Tec,Pla,Share) VALUES(?,?,0,1,?,?,0)")) {
             ps.setString(1, cno);
-            ps.setString(2, "外院课程");
+            ps.setString(2, name.length() > 20 ? name.substring(0, 20) : name);
             ps.setString(3, "外院");
             ps.setString(4, "外院");
             ps.executeUpdate();
