@@ -169,9 +169,6 @@ public final class CollegeBRepository {
      * 选课：上限 5 门；命中复合主键唯一约束（已选过同一门）也算失败。
      */
     public boolean pickCourse(Connection c, String sno, String cno) throws SQLException {
-        if (countSelections(c, sno) >= 5) {
-            return false;
-        }
         try (PreparedStatement ps = c.prepareStatement(
                 "INSERT INTO ENROLLMENT(CRS_NO, STU_NO, SCORE) VALUES(?, ?, 0)")) {
             ps.setString(1, cno);

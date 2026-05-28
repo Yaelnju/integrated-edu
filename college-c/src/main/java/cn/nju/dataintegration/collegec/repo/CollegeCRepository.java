@@ -58,7 +58,7 @@ public final class CollegeCRepository {
     public List<String[]> mySelections(Connection c, String sno) throws SQLException {
         List<String[]> rows = new ArrayList<>();
         try (PreparedStatement ps = c.prepareStatement(
-                "SELECT sc.Sno, sc.Cno, sc.Grd, co.Cnm FROM sc JOIN course co ON co.Cno=sc.Cno WHERE sc.Sno=? ORDER BY sc.Cno")) {
+                "SELECT sc.Sno, sc.Cno, sc.Grd, IFNULL(co.Cnm, sc.Cno) AS Cnm FROM sc LEFT JOIN course co ON co.Cno=sc.Cno WHERE sc.Sno=? ORDER BY sc.Cno")) {
             ps.setString(1, sno);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -110,7 +110,6 @@ public final class CollegeCRepository {
      * 跳过后 pickCourse 的 FK 仍会失败，由 CrossEnrollService 的 try-catch 忽略源院写回失败。
      */
     public void ensureCourseForCross(Connection c, String cno, String courseName) throws SQLException {
-        if (cno.length() > 4) return;
         String name = (courseName != null && !courseName.isBlank()) ? courseName : cno;
         String trunc = name.length() > 20 ? name.substring(0, 20) : name;
         try (PreparedStatement sel = c.prepareStatement("SELECT Cnm FROM course WHERE Cno=?")) {
@@ -152,9 +151,6 @@ public final class CollegeCRepository {
     }
 
     public boolean pickCourse(Connection c, String sno, String cno) throws SQLException {
-        if (countSelections(c, sno) >= 5) {
-            return false;
-        }
         try (PreparedStatement ps = c.prepareStatement("INSERT INTO sc(Sno,Cno,Grd) VALUES(?,?,0)")) {
             ps.setString(1, sno);
             ps.setString(2, cno);

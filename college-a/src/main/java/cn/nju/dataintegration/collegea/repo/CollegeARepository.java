@@ -146,9 +146,6 @@ public final class CollegeARepository {
     }
 
     public boolean pickCourse(Connection c, String sno, String cno) throws SQLException {
-        if (countSelections(c, sno) >= 5) {
-            return false;
-        }
         try (PreparedStatement ps = c.prepareStatement(
                 "INSERT INTO Enrollment(StuID,CourseID,SelectDate,IsCross,HomeCollege) " +
                 "VALUES(?,?,CAST(GETDATE() AS DATE),0,'A')")) {
