@@ -171,7 +171,7 @@ B 学生 ─→ B GUI 退课按钮 ─→ B 业务 TCP DROP ─→ 本地删除 
 2. **F2** `college-c/CollegeCTcpServer.java`：新增 `handleCrossEnroll`；C 学生现在也能跨院选课。
 3. **F2** `college-c/MainFrame.java`：新增"跨院选课"输入框 + JComboBox（目标 A/B）+ 按钮。
 4. **F5** `college-b/CollegeBTcpServer.java` 和 `college-c/CollegeCTcpServer.java`：本地 DROP 通知集成服务器的命令从 `RECORD_DROP` 升级为 `INTEGRATED_DROP`，与 A 对齐，自动触发跨院退课。
-5. **F9** `college-b/CollegeBRepository.java` 和 `college-c/CollegeCRepository.java`：新增 `ensureStudentForCross(sno)`，跨院学生写回前自动建占位学生记录，避免 FK 失败。
+5. **F9** 三院 Repository：新增 `ensureStudentForCross(sno)` 避免学生 FK 失败；新增 `ensureCourseForCross(cno, courseName)` 避免课程 FK 失败，写回时携带集成服务器取到的真实课程名；`enrollForCross` 作为无门数限制的写回专用方法；C 院 `course.Cno`/`sc.Cno` 从 `CHAR(4)` 扩为 `VARCHAR(9)` 以支持六种跨院方向。
 6. **Maven** 父 pom 用 `<dependencyManagement>` 统一 dom4j / jaxen / JUnit 版本；子 pom 改用 `<parent>` 继承。
 7. **Split-IS** 集成服务器从 college-a 内嵌拆出，独立成独立 Maven 模块 `integration-server/`，无 JDBC 依赖；删除 college-c 残留的 integration 死代码。A 离线不再影响集成功能。
 8. **Common** 抽出 `common/` 模块统一维护 `XmlFrameProtocol`，A/B/C/集成服务器不再各复制一份协议工具。
@@ -182,7 +182,7 @@ B 学生 ─→ B GUI 退课按钮 ─→ B 业务 TCP DROP ─→ 本地删除 
   `set JAVA_HOME=C:\path\to\jdk17` 后再 `mvn ...`
 - 集成服务器需要 A 模块在线才能跑；A 离线时 B/C 的"跨院选课"和"集成统计"按钮会弹出"集成服务不可用"。
 - SQL Server Docker 镜像（mcr.microsoft.com/mssql/server）国内可能拉取较慢，必要时换 SQL Server Express 本机安装。
-- 应用启动顺序：A 必须先于 B/C；否则 B/C 的初始化不会失败（集成功能延迟可用即可）。
+- 应用启动顺序：**集成服务器**必须先于 A/B/C 启动（否则 B/C 首次跨院调用时端口 9200 拒绝连接）；A/B/C 三院之间无顺序要求，某院离线时集成统计报告该院"不可用"，其余院正常显示。
 
 ## 九、报告
 
