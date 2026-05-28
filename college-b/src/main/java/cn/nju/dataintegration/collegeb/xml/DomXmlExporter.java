@@ -17,7 +17,7 @@ import java.sql.SQLException;
 /**
  * 把院系 B 数据库表导出为 XML 字符串。
  * 元素名由 SQL 列名决定（Oracle 默认大写），跟 xsd/college-b/ 下的 XSD 一一对应。
- * 不做校验、不做业务过滤 —— 校验交 {@link XmlSchemaValidator}，过滤交业务层。
+ * 不做校验、不做业务过滤 —— 校验交 XmlSchemaValidator，过滤交业务层。
  */
 public final class DomXmlExporter {
 

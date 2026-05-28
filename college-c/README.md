@@ -36,10 +36,7 @@ DataIntegration/
     │   └── net/           # 文本/XML 分帧协议
     └── resources/
         ├── application.properties
-        ├── xsd/college-c/         # 院系 C：4 个 XSD
-        ├── xsd/integration/       # 集成端统一格式 XSD（学生/课程/选课）
-        ├── xsl/integration/       # 院系 C 相关 4 个 XSL（与统一格式互转）
-        └── integration-samples/   # A/B 示例统一 XML（单独演示全院统计用）
+        ├── xsd/college-c/         # 院系 C：学生/课程/选课 XSD
 ```
 
 ---
@@ -178,7 +175,6 @@ mvn clean package
 
 | 文件 | 用途 |
 |------|------|
-| `xsd/college-c/accountC.xsd` | 账户 XML 结构（与课件账户表字段一致时可扩展导出） |
 | `xsd/college-c/studentC.xsd` | 校验 `GET_STUDENTS` 导出 |
 | `xsd/college-c/classC.xsd` | 校验 `GET_COURSES` 导出 |
 | `xsd/college-c/choiceC.xsd` | 校验 `GET_CHOICES` 导出 |
@@ -187,18 +183,18 @@ mvn clean package
 
 | 文件 | 用途 |
 |------|------|
-| `xsd/integration/formatStudent.xsd` | 统一学生结构 |
-| `xsd/integration/formatClass.xsd` | 统一课程结构 |
-| `xsd/integration/formatChoice.xsd` | 统一选课结构 |
+| `integration-server/src/main/resources/xsd/integration/formatStudent.xsd` | 统一学生结构 |
+| `integration-server/src/main/resources/xsd/integration/formatClass.xsd` | 统一课程结构 |
+| `integration-server/src/main/resources/xsd/integration/formatChoice.xsd` | 统一选课结构 |
 
 ### 院系 C 相关 XSL（4 个，部署在集成端逻辑目录）
 
 | 文件 | 方向 |
 |------|------|
-| `xsl/integration/studentC_to_unified.xsl` | C 本地学生 → 统一 |
-| `xsl/integration/unified_to_studentC.xsl` | 统一 → C 本地学生 |
-| `xsl/integration/classC_to_unified.xsl` | C 本地课程 → 统一（`id` 与 `Cno` 的 9 位规则见 XSL 内注释） |
-| `xsl/integration/unified_to_classC.xsl` | 统一 → C 本地课程 |
+| `integration-server/src/main/resources/xsl/integration/studentC_to_unified.xsl` | C 本地学生 → 统一 |
+| `integration-server/src/main/resources/xsl/integration/unified_to_studentC.xsl` | 统一 → C 本地学生 |
+| `integration-server/src/main/resources/xsl/integration/classC_to_unified.xsl` | C 本地课程 → 统一（`id` 与 `Cno` 的 9 位规则见 XSL 内注释） |
+| `integration-server/src/main/resources/xsl/integration/unified_to_classC.xsl` | 统一 → C 本地课程 |
 
 ---
 
@@ -236,7 +232,7 @@ flowchart LR
 ## 与全组系统的衔接说明
 
 - **课程共享 / 跨院系选课写回对方库** 依赖其他同学的客户端、网络框架与 A/B 库；本仓库提供 **C 端完整闭环** 与 **集成端统计、XSL、退课登记** 的可运行实现。
-- 集成统计中 **A、B 人数/课程数** 以 `integration-samples/*.xml` 为准，便于单人验收；联调后应改为真实数据源。
+- 集成统计由独立 `integration-server` 实时访问 A/B/C XML 端口，不再使用离线 sample XML。
 
 ---
 

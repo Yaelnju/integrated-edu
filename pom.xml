@@ -12,6 +12,7 @@
     <description>南京大学《数据集成》课程作业。三人三院三 DBMS（SQL Server/Oracle/MySQL），通过集成服务器以 XML+XSD+XSL 完成跨院选课与集成统计。</description>
 
     <modules>
+        <module>common</module>
         <module>integration-server</module>
         <module>college-a</module>
         <module>college-b</module>

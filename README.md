@@ -16,13 +16,14 @@ integrated-edu/                 ← Maven 父工程 (packaging=pom)
 │   ├── start-dbs.ps1           起 3 个 Docker DB
 │   ├── load-schemas.ps1        灌 schema + seed
 │   └── start-all.md            4 窗口启动顺序 + 故障排查
+├── common/                     公共工具：XmlFrameProtocol（TCP 帧）+ XmlSchemaValidator（XSD 校验）
 ├── integration-server/         集成服务器（独立模块，端口 9200，无 DBMS 依赖）
 ├── college-a/                  Student 1 — SQL Server
 ├── college-b/                  Student 2 — Oracle
 └── college-c/                  Student 3 — MySQL
 ```
 
-`mvn -q -pl <module> exec:java` 单跑某模块；`mvn -q install` 编译全部；`mvn -q test` 一次跑全 3 套 11 用例单元测试。
+`mvn -q -pl <module> exec:java` 单跑某模块；`mvn -q install` 编译全部；`mvn -q test` 一次跑全 3 套 15 用例单元测试。
 
 ## 二、端口分配
 
@@ -37,7 +38,6 @@ integrated-edu/                 ← Maven 父工程 (packaging=pom)
 - `STATS_ALL` — 汇总三院学生/课程/选课数
 - `CROSS_ENROLL|sno|cno|target` — 跨院选课
 - `INTEGRATED_DROP|sno|cno` — 集成环境退选（源院 + 开课院都删）
-- `RECORD_DROP|sno|cno` — 退课审计日志（兼容老接口）
 
 ## 三、快速启动（本机 Docker）
 
@@ -149,7 +149,7 @@ B 学生 ─→ B GUI 退课按钮 ─→ B 业务 TCP DROP ─→ 本地删除 
 - JAXP（XSD 校验 / XSLT 1.0）
 - 纯 TCP socket（无 HTTP、无 Spring）；行命令 + `<XMLBEGIN>/<XMLEND>` 帧
 - Swing GUI
-- JUnit 5（college-c 有 XsltRoundTripTest）
+- JUnit 5（集成服务器覆盖 XSD 校验、XSL 映射和跨院路由规则）
 - JDBC 驱动：mssql-jdbc 12.8 / ojdbc11 23.5 / mysql-connector-j 8.3
 
 ## 六、团队分工
@@ -171,7 +171,8 @@ B 学生 ─→ B GUI 退课按钮 ─→ B 业务 TCP DROP ─→ 本地删除 
 4. **F5** `college-b/CollegeBTcpServer.java` 和 `college-c/CollegeCTcpServer.java`：本地 DROP 通知集成服务器的命令从 `RECORD_DROP` 升级为 `INTEGRATED_DROP`，与 A 对齐，自动触发跨院退课。
 5. **F9** `college-b/CollegeBRepository.java` 和 `college-c/CollegeCRepository.java`：新增 `ensureStudentForCross(sno)`，跨院学生写回前自动建占位学生记录，避免 FK 失败。
 6. **Maven** 父 pom 用 `<dependencyManagement>` 统一 dom4j / jaxen / JUnit 版本；子 pom 改用 `<parent>` 继承。
-7. **Split-IS** 集成服务器从 college-a 内嵌拆出，独立成第 4 个 Maven 模块 `integration-server/`，无 JDBC 依赖；删除 college-c 残留的 integration 死代码。A 离线不再影响集成功能。
+7. **Split-IS** 集成服务器从 college-a 内嵌拆出，独立成独立 Maven 模块 `integration-server/`，无 JDBC 依赖；删除 college-c 残留的 integration 死代码。A 离线不再影响集成功能。
+8. **Common** 抽出 `common/` 模块统一维护 `XmlFrameProtocol`，A/B/C/集成服务器不再各复制一份协议工具。
 
 ## 八、已知限制
 

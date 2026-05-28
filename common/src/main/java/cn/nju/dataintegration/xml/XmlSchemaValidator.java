@@ -1,4 +1,4 @@
-package cn.nju.dataintegration.collegec.xml;
+package cn.nju.dataintegration.xml;
 
 import org.xml.sax.SAXException;
 

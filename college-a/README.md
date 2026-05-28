@@ -83,23 +83,16 @@ college-a/
 ├── sql/
 │   ├── 01_schema.sql        SQL Server DDL
 │   └── 02_seed.sql          50 学生 / 10 课程 / 250 选课
-├── docs/
-│   └── 报告-数据集成流程.md
 └── src/main/
 	├── java/cn/nju/dataintegration/
 	│   ├── collegea/         (CollegeAApplication, GUI, TCP, Repo)
-	│   ├── integration/      (IntegrationApplication + 集成逻辑)
 	│   ├── config/           (AppConfig)
 	│   ├── db/               (Db)
-	│   ├── net/              (XmlFrameProtocol)
 	│   └── tools/            (DbConnectionTest)
 	└── resources/
 		├── application.properties
 		├── application.properties.example
-		├── xsd/college-a/    本院 schema
-		├── xsd/college-b/    对接校验（B）
-		├── xsd/integration/  规范格式 schema
-		└── xsl/integration/  A ↔ 规范格式 XSL
+		└── xsd/college-a/    本院 schema
 ```
 
 ## 五、给 B/C 的对接说明
@@ -107,7 +100,7 @@ college-a/
 ### 5.1 A 的 XML 服务端口（9102）
 
 命令用 `|` 分隔，XML 用 `<XMLBEGIN>…<XMLEND>` 帧住。协议工具：
-`cn.nju.dataintegration.net.XmlFrameProtocol`（三院共用）。
+`common` 模块中的 `cn.nju.dataintegration.net.XmlFrameProtocol`（三院共用）。
 
 | 命令 | 返回 | 你什么时候用 |
 |---|---|---|
@@ -135,18 +128,14 @@ college-a/
 | 课号 | 9 位 | 5 位 | 4 位 |
 | 共享标志 | `Cou_share` | `SHARED` | `Share` |
 
-集成层通过 **XML + XSL** 映射到 `xsd/integration/format*.xsd` 统一格式。
+集成层通过 `integration-server/src/main/resources/xsl/integration/` 下的 XSL 映射到统一格式。
 
 ## 六、三院联调顺序
 
 ```text
-终端1: DataIntegration-collegeA     → mvn exec:java   (A + 集成 9200)
-终端2: DataIntegration-collegeB     → mvn exec:java   (Oracle B)
-终端3: Data-integration---Database-in-MySQL → mvn exec:java (MySQL C)
+终端1: integration-server → mvn -q -pl integration-server exec:java
+终端2: college-a          → mvn -q -pl college-a exec:java
+终端3: college-b          → mvn -q -pl college-b exec:java
+终端4: college-c          → mvn -q -pl college-c exec:java
 ```
 
-> 若 C 也监听 9200，请先改 C 的 `integration.server.port`，或只由 A 工程启动集成服务。
-
-## 七、报告流程图
-
-见 `docs/报告-数据集成流程.md`（Mermaid，可直接贴入报告）。

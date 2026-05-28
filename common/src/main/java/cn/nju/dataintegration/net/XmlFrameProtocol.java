@@ -12,6 +12,9 @@ public final class XmlFrameProtocol {
     public static final String BEGIN = "<XMLBEGIN>\n";
     public static final String END = "\n<XMLEND>\n";
 
+    private XmlFrameProtocol() {
+    }
+
     public static void writeOkXml(Socket socket, String xml) throws IOException {
         Writer w = new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8);
         w.write("OK\n");

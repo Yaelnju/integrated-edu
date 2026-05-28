@@ -106,16 +106,12 @@ public final class StatsAggregator {
     }
 
     private RemoteCollegeClient clientFor(String college) {
-        if ("A".equals(college)) {
-            return new RemoteCollegeClient("127.0.0.1", config.collegeXmlPort());
+        switch (college) {
+            case "A": return new RemoteCollegeClient(config.collegeAXmlHost(), config.collegeAXmlPort());
+            case "B": return new RemoteCollegeClient(config.collegeBXmlHost(), config.collegeBXmlPort());
+            case "C": return new RemoteCollegeClient(config.collegeCXmlHost(), config.collegeCXmlPort());
+            default:  throw new IllegalArgumentException(college);
         }
-        if ("B".equals(college)) {
-            return new RemoteCollegeClient(config.collegeBXmlHost(), config.collegeBXmlPort());
-        }
-        if ("C".equals(college)) {
-            return new RemoteCollegeClient(config.collegeCXmlHost(), config.collegeCXmlPort());
-        }
-        throw new IllegalArgumentException(college);
     }
 
     private static final class Counts {

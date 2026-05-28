@@ -19,26 +19,14 @@ public final class AppConfig {
     }
 
     public String dbUrl() {
-        String sys = System.getProperty("db.url");
-        if (sys != null && !sys.isBlank()) {
-            return sys;
-        }
         return props.getProperty("db.url");
     }
 
     public String dbUser() {
-        String sys = System.getProperty("db.user");
-        if (sys != null) {
-            return sys;
-        }
         return props.getProperty("db.user", "sa");
     }
 
     public String dbPassword() {
-        String sys = System.getProperty("db.password");
-        if (sys != null) {
-            return sys;
-        }
         return props.getProperty("db.password", "");
     }
 
@@ -54,27 +42,4 @@ public final class AppConfig {
         return Integer.parseInt(props.getProperty("integration.server.port", "9200"));
     }
 
-    public String collegeBXmlHost() {
-        return props.getProperty("college.b.xml.host", "127.0.0.1");
-    }
-
-    public int collegeBXmlPort() {
-        return Integer.parseInt(props.getProperty("college.b.xml.port", "9101"));
-    }
-
-    public String collegeCXmlHost() {
-        return props.getProperty("college.c.xml.host", "127.0.0.1");
-    }
-
-    public int collegeCXmlPort() {
-        return Integer.parseInt(props.getProperty("college.c.xml.port", "9100"));
-    }
-
-    public int collegeBGuiPort() {
-        return Integer.parseInt(props.getProperty("college.b.gui.port", "9001"));
-    }
-
-    public int collegeCGuiPort() {
-        return Integer.parseInt(props.getProperty("college.c.gui.port", "9000"));
-    }
 }

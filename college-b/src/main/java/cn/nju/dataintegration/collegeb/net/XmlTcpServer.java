@@ -2,8 +2,8 @@ package cn.nju.dataintegration.collegeb.net;
 
 import cn.nju.dataintegration.collegeb.repo.CollegeBRepository;
 import cn.nju.dataintegration.collegeb.xml.DomXmlExporter;
-import cn.nju.dataintegration.collegeb.xml.XmlSchemaValidator;
 import cn.nju.dataintegration.config.AppConfig;
+import cn.nju.dataintegration.xml.XmlSchemaValidator;
 import cn.nju.dataintegration.db.Db;
 import cn.nju.dataintegration.net.XmlFrameProtocol;
 

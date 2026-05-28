@@ -2,8 +2,6 @@ package cn.nju.dataintegration.config;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Properties;
 
 /**
@@ -48,11 +46,4 @@ public final class AppConfig {
         return Integer.parseInt(props.getProperty("integration.server.port", "9200"));
     }
 
-    public Path projectRelativeOrNull(String key) {
-        String p = props.getProperty(key);
-        if (p == null || p.isBlank()) {
-            return null;
-        }
-        return Paths.get(p);
-    }
 }

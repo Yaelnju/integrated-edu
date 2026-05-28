@@ -2,8 +2,8 @@ package cn.nju.dataintegration.collegea.net;
 
 import cn.nju.dataintegration.collegea.repo.CollegeARepository;
 import cn.nju.dataintegration.collegea.xml.DomXmlExporter;
-import cn.nju.dataintegration.collegea.xml.XmlSchemaValidator;
 import cn.nju.dataintegration.config.AppConfig;
+import cn.nju.dataintegration.xml.XmlSchemaValidator;
 import cn.nju.dataintegration.db.Db;
 import cn.nju.dataintegration.net.XmlFrameProtocol;
 

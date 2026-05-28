@@ -6,14 +6,9 @@ import cn.nju.dataintegration.net.XmlFrameProtocol;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.time.Instant;
 
 public final class IntegrationTcpServer implements Runnable {
     private final AppConfig config;
@@ -59,12 +54,6 @@ public final class IntegrationTcpServer implements Runnable {
                 }
                 String msg = cross.crossEnroll(p[1], p[2], p[3]);
                 XmlFrameProtocol.writeOkXml(socket, msg);
-            } else if (line.startsWith("RECORD_DROP|")) {
-                appendDropLog(line);
-                try (var w = new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8)) {
-                    w.write("OK\n");
-                    w.flush();
-                }
             } else if (line.startsWith("INTEGRATED_DROP|")) {
                 String[] p = line.split("\\|", -1);
                 if (p.length < 3) {
@@ -83,9 +72,4 @@ public final class IntegrationTcpServer implements Runnable {
         }
     }
 
-    private void appendDropLog(String line) throws IOException {
-        Path p = Path.of(System.getProperty("java.io.tmpdir"), "integration-drop-audit.log");
-        Files.writeString(p, Instant.now() + " " + line + System.lineSeparator(),
-                StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-    }
 }

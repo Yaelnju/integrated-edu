@@ -112,41 +112,36 @@ public final class CrossEnrollService {
     }
 
     private String fetchCoursesXml(String college) throws Exception {
-        if ("A".equals(college)) {
-            return new RemoteCollegeClient("127.0.0.1", config.collegeXmlPort()).fetchXml("GET_COURSES");
-        }
-        if ("B".equals(college)) {
-            return new RemoteCollegeClient(config.collegeBXmlHost(), config.collegeBXmlPort()).fetchXml("GET_COURSES");
-        }
-        if ("C".equals(college)) {
-            return new RemoteCollegeClient(config.collegeCXmlHost(), config.collegeCXmlPort()).fetchXml("GET_COURSES");
-        }
-        throw new IllegalArgumentException("未知学院: " + college);
+        return xmlClient(college).fetchXml("GET_COURSES");
     }
 
     private void enrollOnCollege(String college, String sno, String cno) throws Exception {
-        if ("A".equals(college)) {
-            new RemoteCollegeClient("127.0.0.1", config.collegeXmlPort()).enrollXml(sno, cno);
-        } else if ("B".equals(college)) {
-            new RemoteCollegeClient(config.collegeBXmlHost(), config.collegeBXmlPort()).enrollXml(sno, cno);
-        } else if ("C".equals(college)) {
-            new RemoteCollegeClient(config.collegeCXmlHost(), config.collegeCGuiPort()).pickGui(sno, cno);
-        } else {
-            throw new IllegalArgumentException("未知学院: " + college);
-        }
+        xmlClient(college).enrollXml(sno, cno);
     }
 
     private void dropOnCollege(String college, String sno, String cno) {
         try {
-            if ("A".equals(college)) {
-                new RemoteCollegeClient("127.0.0.1", config.collegeGuiPort()).dropGui(sno, cno);
-            } else if ("B".equals(college)) {
-                new RemoteCollegeClient(config.collegeBXmlHost(), config.collegeBGuiPort()).dropGui(sno, cno);
-            } else if ("C".equals(college)) {
-                new RemoteCollegeClient(config.collegeCXmlHost(), config.collegeCGuiPort()).dropGui(sno, cno);
-            }
+            guiClient(college).dropGui(sno, cno);
         } catch (IOException ignored) {
             // 可能已由本院 GUI 删除
+        }
+    }
+
+    private RemoteCollegeClient xmlClient(String college) {
+        switch (college) {
+            case "A": return new RemoteCollegeClient(config.collegeAXmlHost(), config.collegeAXmlPort());
+            case "B": return new RemoteCollegeClient(config.collegeBXmlHost(), config.collegeBXmlPort());
+            case "C": return new RemoteCollegeClient(config.collegeCXmlHost(), config.collegeCXmlPort());
+            default:  throw new IllegalArgumentException("未知学院: " + college);
+        }
+    }
+
+    private RemoteCollegeClient guiClient(String college) {
+        switch (college) {
+            case "A": return new RemoteCollegeClient(config.collegeAGuiHost(), config.collegeAGuiPort());
+            case "B": return new RemoteCollegeClient(config.collegeBGuiHost(), config.collegeBGuiPort());
+            case "C": return new RemoteCollegeClient(config.collegeCGuiHost(), config.collegeCGuiPort());
+            default:  throw new IllegalArgumentException("未知学院: " + college);
         }
     }
 

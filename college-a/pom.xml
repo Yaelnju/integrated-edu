@@ -19,6 +19,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>cn.nju</groupId>
+            <artifactId>integrated-edu-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.microsoft.sqlserver</groupId>
             <artifactId>mssql-jdbc</artifactId>
         </dependency>
