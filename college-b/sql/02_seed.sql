@@ -105,10 +105,10 @@ FROM student_seq CROSS JOIN course_offset;
 -- ==========================================================
 -- 51 个账户：1 管理员 + 50 学生
 -- 学生账户 ACC_NO = STU_NO，密码统一 '123456'，level=2
--- 管理员账户 admin/admin123，level=1，STU_NO=NULL
+-- 管理员账户 admin/123456，level=1，STU_NO=NULL
 -- ==========================================================
 INSERT ALL
-    INTO ACCOUNT VALUES ('admin',     'admin123', 1, NULL)
+    INTO ACCOUNT VALUES ('admin',     '123456', 1, NULL)
     INTO ACCOUNT VALUES ('B24000001', '123456',   2, 'B24000001')
     INTO ACCOUNT VALUES ('B24000002', '123456',   2, 'B24000002')
     INTO ACCOUNT VALUES ('B24000003', '123456',   2, 'B24000003')

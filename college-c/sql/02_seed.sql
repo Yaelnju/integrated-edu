@@ -1,6 +1,6 @@
 USE college_c_edu;
 
-INSERT INTO account (acc, passwd) VALUES ('admin', 'admin888888');
+INSERT INTO account (acc, passwd) VALUES ('admin', '123456');
 
 INSERT INTO course (Cno, Cnm, Ctm, Cpt, Tec, Pla, Share) VALUES
 ('C001', '数据结构', 48, 4, '王立新', '仙I-303', '1'),

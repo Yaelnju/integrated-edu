@@ -46,6 +46,6 @@ CREATE TABLE dbo.SysUser (
 GO
 
 INSERT INTO dbo.SysUser(UserName, Password, Role) VALUES
-('admin', 'admin123', 'admin'),
-('teacher', 'teacher123', 'teacher');
+('admin', '123456', 'admin'),
+('teacher', '123456', 'teacher');
 GO
