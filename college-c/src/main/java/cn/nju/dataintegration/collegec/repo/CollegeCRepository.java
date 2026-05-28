@@ -38,7 +38,7 @@ public final class CollegeCRepository {
     public List<String[]> listCourses(Connection c) throws SQLException {
         List<String[]> rows = new ArrayList<>();
         try (PreparedStatement ps = c.prepareStatement(
-                "SELECT Cno,Cnm,Ctm,Cpt,Tec,Pla,Share FROM course ORDER BY Cno");
+                "SELECT Cno,Cnm,Ctm,Cpt,Tec,Pla,Share FROM course WHERE Cno LIKE 'C%' ORDER BY Cno");
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 rows.add(new String[]{

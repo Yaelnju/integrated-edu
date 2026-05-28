@@ -43,7 +43,7 @@ public final class CollegeBRepository {
         List<String[]> rows = new ArrayList<>();
         try (PreparedStatement ps = c.prepareStatement(
                 "SELECT CRS_NO, CRS_NAME, PERIODS, CREDIT, TEACHER, LOCATION, SHARED " +
-                "FROM COURSE ORDER BY CRS_NO");
+                "FROM COURSE WHERE SUBSTR(CRS_NO,1,1)='B' ORDER BY CRS_NO");
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 rows.add(new String[]{
@@ -66,8 +66,9 @@ public final class CollegeBRepository {
     public List<String[]> mySelections(Connection c, String sno) throws SQLException {
         List<String[]> rows = new ArrayList<>();
         try (PreparedStatement ps = c.prepareStatement(
-                "SELECT e.STU_NO, e.CRS_NO, e.SCORE, co.CRS_NAME " +
-                "FROM ENROLLMENT e JOIN COURSE co ON co.CRS_NO = e.CRS_NO " +
+                "SELECT e.STU_NO, e.CRS_NO, e.SCORE, " +
+                "NVL(co.CRS_NAME, '(外院课程)') AS CRS_NAME " +
+                "FROM ENROLLMENT e LEFT JOIN COURSE co ON co.CRS_NO = e.CRS_NO " +
                 "WHERE e.STU_NO=? ORDER BY e.CRS_NO")) {
             ps.setString(1, sno);
             try (ResultSet rs = ps.executeQuery()) {

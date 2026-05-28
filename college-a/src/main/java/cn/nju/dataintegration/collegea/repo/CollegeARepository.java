@@ -36,7 +36,7 @@ public final class CollegeARepository {
     public List<String[]> listCourses(Connection c) throws SQLException {
         List<String[]> rows = new ArrayList<>();
         try (PreparedStatement ps = c.prepareStatement(
-                "SELECT CourseID, CourseName, Credit, Teacher, IsShared FROM Course ORDER BY CourseID");
+                "SELECT CourseID, CourseName, Credit, Teacher, IsShared FROM Course WHERE CourseID LIKE 'A%' ORDER BY CourseID");
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 rows.add(new String[]{
