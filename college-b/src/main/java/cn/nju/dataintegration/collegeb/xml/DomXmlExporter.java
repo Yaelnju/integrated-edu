@@ -40,7 +40,7 @@ public final class DomXmlExporter {
 
     public String exportChoices(Connection c) throws SQLException, IOException {
         try (PreparedStatement ps = c.prepareStatement(
-                "SELECT STU_NO, CRS_NO, SCORE FROM ENROLLMENT WHERE SUBSTR(STU_NO,1,1)='B' AND SUBSTR(CRS_NO,1,1)='B' ORDER BY STU_NO, CRS_NO");
+                "SELECT STU_NO, CRS_NO, SCORE FROM ENROLLMENT WHERE SUBSTR(CRS_NO,1,1)='B' ORDER BY STU_NO, CRS_NO");
              ResultSet rs = ps.executeQuery()) {
             return resultSetToXml(rs, "Choices", "choice");
         }

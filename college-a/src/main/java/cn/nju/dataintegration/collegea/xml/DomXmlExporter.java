@@ -34,7 +34,7 @@ public final class DomXmlExporter {
 
     public String exportChoices(Connection c) throws SQLException, IOException {
         try (PreparedStatement ps = c.prepareStatement(
-                "SELECT StuID, CourseID, ISNULL(CAST(Grade AS INT), 0) AS Grade FROM Enrollment WHERE StuID LIKE 'A%' AND CourseID LIKE 'A%' ORDER BY StuID, CourseID");
+                "SELECT StuID, CourseID, ISNULL(CAST(Grade AS INT), 0) AS Grade FROM Enrollment WHERE CourseID LIKE 'A%' ORDER BY StuID, CourseID");
              ResultSet rs = ps.executeQuery()) {
             return resultSetToXml(rs, "Choices", "choice");
         }

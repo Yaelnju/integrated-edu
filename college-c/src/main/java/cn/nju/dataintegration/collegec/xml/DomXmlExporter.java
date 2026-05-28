@@ -31,7 +31,7 @@ public final class DomXmlExporter {
     }
 
     public String exportChoices(Connection c) throws SQLException, IOException {
-        try (PreparedStatement ps = c.prepareStatement("SELECT Sno,Cno,Grd FROM sc WHERE Sno LIKE 'C%' AND Cno LIKE 'C%' ORDER BY Sno,Cno");
+        try (PreparedStatement ps = c.prepareStatement("SELECT Sno,Cno,Grd FROM sc WHERE Cno LIKE 'C%' ORDER BY Sno,Cno");
              ResultSet rs = ps.executeQuery()) {
             return resultSetToXml(rs, "Choices", "choice");
         }
