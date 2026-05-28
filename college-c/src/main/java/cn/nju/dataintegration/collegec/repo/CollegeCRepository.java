@@ -128,6 +128,19 @@ public final class CollegeCRepository {
         }
     }
 
+    /** 集成写回专用：无 5 门上限，重复选当成成功。 */
+    public void enrollForCross(Connection c, String sno, String cno) throws SQLException {
+        try (PreparedStatement ps = c.prepareStatement("INSERT INTO sc(Sno,Cno,Grd) VALUES(?,?,0)")) {
+            ps.setString(1, sno);
+            ps.setString(2, cno);
+            try {
+                ps.executeUpdate();
+            } catch (SQLException ex) {
+                if (!"23000".equals(ex.getSQLState())) throw ex;
+            }
+        }
+    }
+
     public boolean pickCourse(Connection c, String sno, String cno) throws SQLException {
         if (countSelections(c, sno) >= 5) {
             return false;

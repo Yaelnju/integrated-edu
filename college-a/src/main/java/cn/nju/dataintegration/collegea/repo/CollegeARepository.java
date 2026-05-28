@@ -116,12 +116,31 @@ public final class CollegeARepository {
         }
     }
 
+    /** 集成写回专用：无 5 门上限，HomeCollege 从学号首字母推断，重复选当成成功。 */
+    public void enrollForCross(Connection c, String sno, String cno) throws SQLException {
+        String home = sno.isEmpty() ? "A" : String.valueOf(sno.charAt(0)).toUpperCase();
+        try (PreparedStatement ps = c.prepareStatement(
+                "INSERT INTO Enrollment(StuID,CourseID,SelectDate,IsCross,HomeCollege) " +
+                "VALUES(?,?,CAST(GETDATE() AS DATE),1,?)")) {
+            ps.setString(1, sno);
+            ps.setString(2, cno);
+            ps.setString(3, home);
+            try {
+                ps.executeUpdate();
+            } catch (SQLException ex) {
+                if ("23000".equals(ex.getSQLState()) || ex.getErrorCode() == 2627) return;
+                throw ex;
+            }
+        }
+    }
+
     public boolean pickCourse(Connection c, String sno, String cno) throws SQLException {
         if (countSelections(c, sno) >= 5) {
             return false;
         }
         try (PreparedStatement ps = c.prepareStatement(
-                "INSERT INTO Enrollment(StuID, CourseID, SelectDate, IsCross, HomeCollege) VALUES(?,?,CAST(GETDATE() AS DATE),0,'A')")) {
+                "INSERT INTO Enrollment(StuID,CourseID,SelectDate,IsCross,HomeCollege) " +
+                "VALUES(?,?,CAST(GETDATE() AS DATE),0,'A')")) {
             ps.setString(1, sno);
             ps.setString(2, cno);
             try {

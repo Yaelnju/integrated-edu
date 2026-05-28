@@ -106,8 +106,8 @@ public final class XmlTcpServer implements Runnable {
 
     private void serveEnroll(Socket socket, Connection c, String cmd) throws Exception {
         String[] parts = cmd.split("\\|", -1);
-        if (parts.length != 3 || parts[1].isEmpty() || parts[2].isEmpty()) {
-            XmlFrameProtocol.writeErr(socket, "ENROLL 参数错误，应为 ENROLL|sno|cno");
+        if (parts.length < 3 || parts[1].isEmpty() || parts[2].isEmpty()) {
+            XmlFrameProtocol.writeErr(socket, "ENROLL 参数错误，应为 ENROLL|sno|cno[|courseName]");
             return;
         }
         String sno = parts[1];
@@ -115,12 +115,8 @@ public final class XmlTcpServer implements Runnable {
         String courseName = parts.length > 3 ? parts[3] : null;
         repo.ensureStudentForCross(c, sno);
         repo.ensureCourseForCross(c, cno, courseName);
-        boolean ok = repo.pickCourse(c, sno, cno);
-        if (ok) {
-            writeOk(socket);
-        } else {
-            XmlFrameProtocol.writeErr(socket, "选课失败（已选过 / 超过 5 门 / 学生或课程不存在）");
-        }
+        repo.enrollForCross(c, sno, cno);
+        writeOk(socket);
     }
 
     private void writeOk(Socket socket) throws IOException {
