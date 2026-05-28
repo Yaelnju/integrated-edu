@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>integrated-edu-college-a</artifactId>
-    <name>Integrated Edu — College A (SQL Server) + Integration Server</name>
+    <name>Integrated Edu — College A (SQL Server)</name>
 
     <properties>
         <exec.mainClass>cn.nju.dataintegration.collegea.CollegeAApplication</exec.mainClass>

@@ -5,14 +5,14 @@ import cn.nju.dataintegration.collegea.net.CollegeATcpServer;
 import cn.nju.dataintegration.collegea.net.XmlTcpServer;
 import cn.nju.dataintegration.config.AppConfig;
 import cn.nju.dataintegration.db.Db;
-import cn.nju.dataintegration.integration.IntegrationTcpServer;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import java.sql.Connection;
 
 /**
- * 学院 A 主入口：集成服务器(9200) + 业务(9002) + XML(9102) + Swing 登录。
+ * 学院 A 主入口：业务(9002) + XML(9102) + Swing 登录。
+ * 集成服务器(9200)已拆分到 integration-server 模块独立启动。
  */
 public final class CollegeAApplication {
 
@@ -29,7 +29,6 @@ public final class CollegeAApplication {
                 System.out.println("[CollegeA] 已连接 SQL Server 库: " + rs.getString(1)
                         + " | 学生=" + rs.getInt(2) + " 课程=" + rs.getInt(3));
             }
-            new Thread(new IntegrationTcpServer(config), "integration-tcp").start();
             new Thread(new CollegeATcpServer(config, db), "college-a-tcp").start();
             new Thread(new XmlTcpServer(config, db), "college-a-xml").start();
             Thread.sleep(300);

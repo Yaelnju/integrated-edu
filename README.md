@@ -10,22 +10,28 @@ integrated-edu/                 ← Maven 父工程 (packaging=pom)
 ├── pom.xml                     父 pom：统一 dependency / plugin 版本
 ├── README.md                   本文件
 ├── docs/
-│   └── 报告.md                  作业报告（待完成 — 见 Step 5）
-├── college-a/                  Student 1 — SQL Server + 集成服务器 (9200)
-├── college-b/                  Student 2 — Oracle + XSD 校验模块
+│   ├── 报告.md                  作业报告
+│   └── screenshots/            联调截图（用户驱动）
+├── scripts/
+│   ├── start-dbs.ps1           起 3 个 Docker DB
+│   ├── load-schemas.ps1        灌 schema + seed
+│   └── start-all.md            4 窗口启动顺序 + 故障排查
+├── integration-server/         集成服务器（独立模块，端口 9200，无 DBMS 依赖）
+├── college-a/                  Student 1 — SQL Server
+├── college-b/                  Student 2 — Oracle
 └── college-c/                  Student 3 — MySQL
 ```
 
-`mvn -q -pl <module> exec:java` 单跑某一院；`mvn -q install` 编译全部。
+`mvn -q -pl <module> exec:java` 单跑某模块；`mvn -q install` 编译全部；`mvn -q test` 一次跑全 3 套 11 用例单元测试。
 
 ## 二、端口分配
 
 | 模块 | 业务 TCP | XML TCP | DB |
 |---|---|---|---|
-| College A（含集成服务器） | 9002 | 9102 | SQL Server `localhost:1433/CollegeA_DB` |
+| integration-server | — | 9200 | — |
+| College A | 9002 | 9102 | SQL Server `localhost:1433/CollegeA_DB` |
 | College B | 9001 | 9101 | Oracle `localhost:1521/FREEPDB1` |
 | College C | 9000 | 9100 | MySQL `localhost:3306/college_c_edu` |
-| 集成服务器（在 A 进程内） | — | 9200 | — |
 
 集成服务器命令（端口 9200）：
 - `STATS_ALL` — 汇总三院学生/课程/选课数
@@ -58,29 +64,36 @@ docker logs sqlserver   # 看到 "SQL Server is now ready for client connections
 
 ### 3.2 建表 + 灌数据
 
-按各院 `sql/01_schema.sql` 和 `sql/02_seed.sql` 依次执行。每院 README/sql 目录里有详细步骤。
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\load-schemas.ps1
+```
 
+脚本走 `docker exec` 调三套客户端（sqlcmd / sqlplus / mysql），一键灌 3 院 schema + seed，期望每院 50 学生 / 10 课程 / 250 选课。
+
+手工方式亦可：
 - College A：SSMS 或 sqlcmd 连 `sa` 跑两份脚本，库名 `CollegeA_DB`
 - College B：先建用户 `collegeb / collegeb123` 并授权，再以该账号执行
 - College C：以 root 连接，DB 已自动建好
 
-### 3.3 三窗口启动应用
+### 3.3 4 窗口启动应用
 
 ```powershell
-# 终端 1 — College A + 集成服务器
-cd integrated-edu/college-a
-mvn -q exec:java
+# 终端 1 — 集成服务器（必须先起）
+mvn -q -pl integration-server exec:java
 
-# 终端 2 — College B
-cd integrated-edu/college-b
-mvn -q exec:java
+# 终端 2 — College A
+mvn -q -pl college-a exec:java
 
-# 终端 3 — College C
-cd integrated-edu/college-c
-mvn -q exec:java
+# 终端 3 — College B
+mvn -q -pl college-b exec:java
+
+# 终端 4 — College C
+mvn -q -pl college-c exec:java
 ```
 
-**启动顺序重要**：A 必须先启动（集成服务器 9200 才能就绪）。B/C 不依赖启动顺序。
+详细顺序、JDK 设置、5 类故障排查见 `scripts\start-all.md`。
+
+**启动顺序**：integration-server 必须先于 A/B/C（端口 9200 就绪后，跨院调用才不会被拒）。
 
 ### 3.4 默认账号
 
@@ -143,10 +156,10 @@ B 学生 ─→ B GUI 退课按钮 ─→ B 业务 TCP DROP ─→ 本地删除 
 
 | 同学 | 模块 | 主要工作 |
 |---|---|---|
-| Student 1 | college-a | SQL Server schema/seed/repo/GUI；**集成服务器**（CrossEnrollService / StatsAggregator / XsltTransformer / RemoteCollegeClient）；XSL 全套；报告 Mermaid 流程图骨架 |
-| Student 2 | college-b | Oracle schema/seed/repo/GUI；XSD 校验模块 `XmlValidator`（集成服务器复用）；B↔规范格式 XSL |
+| Student 1 | college-a + integration-server | SQL Server schema/seed/repo/GUI；**集成服务器主框架**（CrossEnrollService / StatsAggregator / XsltTransformer / RemoteCollegeClient）；A/B/C 三向 XSL 全套；报告 Mermaid 流程图骨架 |
+| Student 2 | college-b + integration-server/XmlValidator | Oracle schema/seed/repo/GUI；XSD 校验组件 `XmlValidator`（集成服务器 StatsAggregator 调用）；B↔规范格式 XSL |
 | Student 3 | college-c | MySQL schema/seed/repo/GUI；首版 `XmlFrameProtocol`（A/B 复用）；JUnit XSL 往返测试；首版规范格式 XSD |
-| 全员 | 合并联调 | Maven 聚合工程；跨模块接口对接；XSD 一致性；联调用例 |
+| 全员 | 合并联调 | Maven 4 模块聚合；跨模块接口对接；集成服务器拆分独立部署；联调用例 |
 
 ## 七、合并阶段的接口对齐变更（来自 `integrated-edu` 初始 commit）
 
@@ -158,6 +171,7 @@ B 学生 ─→ B GUI 退课按钮 ─→ B 业务 TCP DROP ─→ 本地删除 
 4. **F5** `college-b/CollegeBTcpServer.java` 和 `college-c/CollegeCTcpServer.java`：本地 DROP 通知集成服务器的命令从 `RECORD_DROP` 升级为 `INTEGRATED_DROP`，与 A 对齐，自动触发跨院退课。
 5. **F9** `college-b/CollegeBRepository.java` 和 `college-c/CollegeCRepository.java`：新增 `ensureStudentForCross(sno)`，跨院学生写回前自动建占位学生记录，避免 FK 失败。
 6. **Maven** 父 pom 用 `<dependencyManagement>` 统一 dom4j / jaxen / JUnit 版本；子 pom 改用 `<parent>` 继承。
+7. **Split-IS** 集成服务器从 college-a 内嵌拆出，独立成第 4 个 Maven 模块 `integration-server/`，无 JDBC 依赖；删除 college-c 残留的 integration 死代码。A 离线不再影响集成功能。
 
 ## 八、已知限制
 
